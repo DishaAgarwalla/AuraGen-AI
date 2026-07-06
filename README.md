@@ -85,137 +85,22 @@ Dynamic React Rendering
 
 ---
 
-## 📂 Project Structure
-
-```text
 AuraGen/
 │
-├── 📁 frontend/
-│   │
-│   ├── 📁 public/                  # Static assets
-│   │
-│   ├── 📁 src/
-│   │   │
-│   │   ├── 📁 app/                 # Next.js App Router
-│   │   │   ├── layout.tsx
-│   │   │   ├── page.tsx
-│   │   │   ├── globals.css
-│   │   │   └── favicon.ico
-│   │   │
-│   │   ├── 📁 components/
-│   │   │   ├── 📁 forms/
-│   │   │   │   ├── FinancialForm.tsx
-│   │   │   │   └── WizardForm.tsx
-│   │   │   │
-│   │   │   ├── 📁 telemetry/
-│   │   │   │   ├── TelemetryPanel.tsx
-│   │   │   │   └── CognitiveScore.tsx
-│   │   │   │
-│   │   │   ├── 📁 ui/
-│   │   │   │   ├── Button.tsx
-│   │   │   │   ├── Input.tsx
-│   │   │   │   ├── Card.tsx
-│   │   │   │   └── Loader.tsx
-│   │   │   │
-│   │   │   └── Navbar.tsx
-│   │   │
-│   │   ├── 📁 hooks/
-│   │   │   ├── useTelemetry.ts
-│   │   │   ├── useCognitiveLoad.ts
-│   │   │   └── useSocket.ts
-│   │   │
-│   │   ├── 📁 lib/
-│   │   │   ├── socket.ts
-│   │   │   └── constants.ts
-│   │   │
-│   │   ├── 📁 services/
-│   │   │   ├── telemetry.service.ts
-│   │   │   ├── ai.service.ts
-│   │   │   └── api.ts
-│   │   │
-│   │   ├── 📁 utils/
-│   │   │   ├── calculateScore.ts
-│   │   │   ├── validators.ts
-│   │   │   └── helpers.ts
-│   │   │
-│   │   ├── 📁 types/
-│   │   │   ├── telemetry.ts
-│   │   │   ├── ai.ts
-│   │   │   └── form.ts
-│   │   │
-│   │   └── 📁 styles/
-│   │       └── animations.css
-│   │
+├── frontend/
+│   ├── public/
+│   ├── src/
 │   ├── package.json
 │   ├── tsconfig.json
-│   └── next.config.ts
+│   └── ...
 │
-│
-├── 📁 backend/
-│   │
-│   ├── 📁 src/
-│   │   │
-│   │   ├── 📁 config/
-│   │   │   ├── env.ts
-│   │   │   └── ollama.ts
-│   │   │
-│   │   ├── 📁 routes/
-│   │   │   ├── ai.routes.ts
-│   │   │   └── telemetry.routes.ts
-│   │   │
-│   │   ├── 📁 controllers/
-│   │   │   ├── ai.controller.ts
-│   │   │   └── telemetry.controller.ts
-│   │   │
-│   │   ├── 📁 services/
-│   │   │   ├── ai.service.ts
-│   │   │   ├── telemetry.service.ts
-│   │   │   └── websocket.service.ts
-│   │   │
-│   │   ├── 📁 agents/
-│   │   │   ├── codeGeneration.agent.ts
-│   │   │   ├── promptTemplates.ts
-│   │   │   └── langchain.ts
-│   │   │
-│   │   ├── 📁 compiler/
-│   │   │   ├── astValidator.ts
-│   │   │   ├── parser.ts
-│   │   │   └── sanitizer.ts
-│   │   │
-│   │   ├── 📁 websocket/
-│   │   │   └── socket.ts
-│   │   │
-│   │   ├── 📁 middleware/
-│   │   │   ├── errorHandler.ts
-│   │   │   └── logger.ts
-│   │   │
-│   │   ├── 📁 utils/
-│   │   │   ├── calculateScore.ts
-│   │   │   └── helpers.ts
-│   │   │
-│   │   ├── 📁 types/
-│   │   │   ├── telemetry.ts
-│   │   │   ├── ai.ts
-│   │   │   └── websocket.ts
-│   │   │
-│   │   ├── app.ts
-│   │   └── server.ts
-│   │
+├── backend/
+│   ├── node_modules/
 │   ├── package.json
-│   ├── tsconfig.json
-│   └── .env.example
+│   └── tsconfig.json
 │
-├── 📁 docs/
-│   ├── architecture.png
-│   ├── screenshots/
-│   ├── demo.gif
-│   └── flow-diagram.png
-│
-├── .gitignore
-├── LICENSE
 ├── README.md
-└── package.json (optional, if using npm workspaces)
-```
+└── LICENSE
 
 ## 🚧 Project Status
 
