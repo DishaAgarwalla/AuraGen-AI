@@ -85,26 +85,27 @@ Dynamic React Rendering
 
 ---
 
-AuraGen/
+## 📂 Repository Structure
+
+```text
+AuraGen
 │
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── ...
-│
-├── backend/
-│   ├── node_modules/
+├── 📦 frontend
+│   ├── public
+│   ├── src
 │   ├── package.json
 │   └── tsconfig.json
 │
-├── README.md
-└── LICENSE
+├── 📦 backend
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── 📄 README.md
+├── 📄 LICENSE
+└── 📄 .gitignore
+```
 
-## 🚧 Project Status
-
-> This project is currently under active development as part of an AI-focused internship.
+> **Note:** This repository is currently under active development. The project structure will evolve as new features are implemented.
 
 ### Completed
 
