@@ -8,6 +8,8 @@ import Checkbox from "../ui/Checkbox";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 
+import { submitFinancialForm } from "@/services/api";
+
 export default function FinancialForm() {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -28,33 +30,42 @@ export default function FinancialForm() {
     agree: false,
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]:
         type === "checkbox"
           ? (e.target as HTMLInputElement).checked
           : value,
-    });
+    }));
   };
 
-  const handleSubmit = (
+  const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
-    console.log(formData);
+    try {
+      setLoading(true);
 
-    alert("🎉 Form Submitted Successfully!");
+      const response = await submitFinancialForm(formData);
 
-    // Later:
-    // Send data to backend
-    // Calculate Cognitive Load
-    // Trigger AI
+      console.log(response);
+
+      alert("🎉 Form Submitted Successfully!");
+
+    } catch (error) {
+      console.error(error);
+      alert("❌ Failed to submit form.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -228,7 +239,7 @@ export default function FinancialForm() {
         />
 
         <Button
-          text="Submit Application"
+          text={loading ? "Submitting..." : "Submit Application"}
           type="submit"
         />
       </form>
