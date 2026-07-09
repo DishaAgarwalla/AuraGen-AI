@@ -2,27 +2,57 @@ import express from "express";
 import cors from "cors";
 
 import formRoutes from "./routes/formRoutes";
+import telemetryRoutes from "./routes/telemetryRoutes";
 
 const app = express();
 const PORT = 3001;
 
+/*
+=====================================
+Middlewares
+=====================================
+*/
+
 app.use(cors());
+
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("🚀 AuraGen Backend is running...");
+/*
+=====================================
+Health Routes
+=====================================
+*/
+
+app.get("/", (_, res) => {
+  res.send("🚀 AuraGen Backend Running");
 });
 
-app.get("/health", (req, res) => {
+app.get("/health", (_, res) => {
   res.json({
-    status: "OK",
-    message: "Backend is healthy 🚀",
+    success: true,
+    message: "Backend Healthy",
   });
 });
 
-// Register Form Routes
+/*
+=====================================
+API Routes
+=====================================
+*/
+
 app.use("/api/form", formRoutes);
 
+app.use("/api/telemetry", telemetryRoutes);
+
+/*
+=====================================
+Server
+=====================================
+*/
+
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log("====================================");
+  console.log("🚀 AuraGen Backend Started");
+  console.log(`🌐 http://localhost:${PORT}`);
+  console.log("====================================");
 });
