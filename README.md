@@ -18,8 +18,6 @@ Transforming complex user experiences into intuitive workflows using
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js)
 ![Express](https://img.shields.io/badge/Express-000000?style=flat-square&logo=express)
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?style=flat-square&logo=socketdotio)
-![LangChain](https://img.shields.io/badge/LangChain-00A67E?style=flat-square)
-![Ollama](https://img.shields.io/badge/Ollama-000000?style=flat-square)
 
 </p>
 
@@ -29,38 +27,52 @@ Transforming complex user experiences into intuitive workflows using
 
 # 📖 Overview
 
-AuraGen is an AI-powered self-healing user interface designed to improve user experience during complex workflows.
+AuraGen is an AI-powered Self-Healing User Interface that aims to simplify complex applications by adapting the interface based on user behavior.
 
-Instead of relying on static help pages or documentation, AuraGen observes user interaction patterns, estimates cognitive load, and dynamically adapts the interface into a simpler, guided experience while preserving the user's progress.
+Instead of static dashboards, AuraGen will monitor user interactions such as hesitation, rage clicks, and cursor movement to estimate cognitive load. When frustration increases, an AI agent will generate a simpler interface while preserving user progress.
 
-The current prototype demonstrates this concept using a **Financial Onboarding Form**, which will later evolve into an adaptive AI-generated interface.
-
----
-
-# ✨ Features
-
-## Current
-
-- 📝 Financial Onboarding Form
-- ⚛️ Reusable React UI Components
-- 📱 Responsive Layout
-- 📊 Client-side Form State Management
-- 🏗 Modular Project Architecture
-- 🔧 Express Backend Setup
-
-## Upcoming
-
-- 🧠 Cognitive Load Detection
-- 🖱 User Telemetry Collection
-- ⚡ WebSocket Communication
-- 🤖 AI-Powered UI Generation
-- 🔄 Dynamic React Component Rendering
-- 🛡 AST Validation
-- 💬 LangChain + Ollama Integration
+The current prototype focuses on a **Financial Onboarding Form** and a modular backend architecture that will later support AI-driven UI generation.
 
 ---
 
-# 🏗 Architecture
+# ✨ Current Features
+
+- ✅ Financial Onboarding Form
+- ✅ Responsive React UI
+- ✅ Reusable Components
+- ✅ Express Backend
+- ✅ REST API Architecture
+- ✅ Form API Endpoint
+- ✅ AI API Endpoint Structure
+- ✅ Service Layer Architecture
+- ✅ Modular Backend Folder Structure
+
+---
+
+# 🚧 Features In Progress
+
+- AI Service Integration
+- OpenRouter Integration
+- Prompt Engineering
+- Telemetry Collection
+- Backend Form Submission
+- WebSocket Communication
+
+---
+
+# ⏳ Planned Features
+
+- Cognitive Load Detection
+- Mouse & Keyboard Tracking
+- LangChain Integration
+- AI Agent Workflow
+- Dynamic React Component Generation
+- AST Validation
+- Adaptive UI Rendering
+
+---
+
+# 🏗 Current Architecture
 
 ```text
                     User
@@ -69,34 +81,27 @@ The current prototype demonstrates this concept using a **Financial Onboarding F
           Financial Onboarding Form
                       │
                       ▼
-            Interaction Tracking
+             React Components
                       │
                       ▼
-          Cognitive Load Detection
+              Express Backend
                       │
-                      ▼
-             LangChain AI Agent
-                      │
-                      ▼
-                  Ollama
-                      │
-                      ▼
-         Adaptive UI Generation
-                      │
-                      ▼
-        Dynamic React Rendering
+          ┌───────────┴───────────┐
+          │                       │
+          ▼                       ▼
+     Form APIs              AI API Endpoint
 ```
 
 ---
 
 # ⚙️ Tech Stack
 
-| Frontend | Backend | AI |
-|----------|----------|------|
-| Next.js 16 | Node.js | LangChain |
-| React 19 | Express | Ollama |
-| TypeScript | Socket.IO | Llama 3 |
-| Tailwind CSS | TypeScript | Prompt Engineering |
+| Frontend | Backend | AI (Upcoming) |
+|-----------|----------|---------------|
+| Next.js | Node.js | OpenRouter |
+| React | Express | LangChain |
+| TypeScript | TypeScript  |
+| Tailwind CSS | REST API | LLM |
 
 ---
 
@@ -105,43 +110,37 @@ The current prototype demonstrates this concept using a **Financial Onboarding F
 ```text
 AuraGen
 │
-├── 📦 frontend
+├── frontend
 │   ├── public
 │   ├── src
 │   │
 │   ├── app
 │   ├── components
-│   │   ├── forms
-│   │   └── ui
-│   │
 │   ├── hooks
 │   ├── services
 │   ├── types
 │   └── utils
 │
-├── 📦 backend
+├── backend
 │   ├── src
 │   │
-│   ├── agents
-│   ├── compiler
 │   ├── controllers
-│   ├── middleware
-│   ├── prompts
 │   ├── routes
 │   ├── services
+│   ├── middleware
 │   ├── utils
-│   └── websocket
+│   └── index.ts
 │
 ├── README.md
-├── .gitignore
-└── LICENSE
+├── LICENSE
+└── .gitignore
 ```
 
 ---
 
 # 🚀 Getting Started
 
-## Clone the repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/DishaAgarwalla/AuraGen-AI.git
@@ -159,19 +158,19 @@ cd AuraGen-AI
 cd backend
 ```
 
-Install dependencies
+Install packages
 
 ```bash
 npm install
 ```
 
-Run the backend
+Run server
 
 ```bash
 npm run dev
 ```
 
-Backend runs at
+Backend
 
 ```
 http://localhost:3001
@@ -185,19 +184,19 @@ http://localhost:3001
 cd frontend
 ```
 
-Install dependencies
+Install packages
 
 ```bash
 npm install
 ```
 
-Run the frontend
+Run frontend
 
 ```bash
 npm run dev
 ```
 
-Frontend runs at
+Frontend
 
 ```
 http://localhost:3000
@@ -209,52 +208,57 @@ http://localhost:3000
 
 ## ✅ Completed
 
-- ✔ GitHub Repository Setup
-- ✔ Frontend Initialization (Next.js + React + TypeScript)
-- ✔ Backend Initialization (Express + TypeScript)
-- ✔ Tailwind CSS Setup
-- ✔ Reusable UI Components
-- ✔ Financial Onboarding Form
-- ✔ Client-side Form State Management
-- ✔ Responsive UI Layout
+- Project Initialization
+- Git Repository Setup
+- Next.js Frontend
+- Express Backend
+- TypeScript Configuration
+- Tailwind CSS Setup
+- Financial Onboarding Form
+- Reusable Components
+- Responsive Layout
+- Backend Route Structure
+- Controller Layer
+- Service Layer
+- AI Endpoint (`/api/ai/generate`)
+- Form Endpoint
+- Health Check Endpoint
 
 ---
 
-## 🚧 In Progress
+## 🚧 Currently Working On
 
-- Backend API Integration
-- Form Submission Endpoint
-- Telemetry Collection
-- Cognitive Load Metrics
+- OpenRouter Integration
+- AI Response Generation
+- Backend ↔ AI Communication
+- Telemetry APIs
 
 ---
 
-## ⏳ Planned
+## ⏳ Upcoming
 
-- LangChain Integration
-- Ollama Integration
-- Prompt Engineering
-- Cognitive Load Engine
-- Adaptive UI Generator
-- Dynamic React Rendering
+- LangChain
+- Cognitive Load Detection
+- AI Agent
+- Dynamic UI Generation
+- Adaptive Interface
 - AST Validation
-- Live UI Morphing
 
 ---
 
-# 🎯 Project Roadmap
+# 🛣 Roadmap
 
 - [x] Project Setup
-- [x] Frontend Architecture
-- [x] Backend Architecture
+- [x] Frontend
+- [x] Backend
 - [x] Financial Form
-- [ ] Frontend ↔ Backend Integration
-- [ ] User Telemetry
+- [x] API Architecture
+- [x] AI Endpoint
+- [ ] AI Integration
+- [ ] Telemetry Engine
 - [ ] Cognitive Load Detection
-- [ ] LangChain Agent
-- [ ] Ollama Integration
-- [ ] Adaptive UI Generation
-- [ ] Dynamic React Rendering
+- [ ] LangChain
+- [ ] Dynamic UI Generation
 - [ ] AST Validation
 - [ ] Production Deployment
 
@@ -262,19 +266,20 @@ http://localhost:3000
 
 # 📸 Screenshots
 
-> Screenshots will be added as the project evolves.
+> Screenshots will be added as development progresses.
 
 ---
 
-# 💡 Future Scope
+# 💡 Future Vision
 
-AuraGen aims to become a general-purpose adaptive interface engine capable of:
+AuraGen aims to become an adaptive UI framework capable of:
 
-- Detecting user frustration in real time
-- Simplifying complex workflows automatically
-- Generating personalized UI components using LLMs
-- Supporting enterprise applications such as banking, insurance, healthcare, and government portals
-- Providing accessibility-focused adaptive interfaces
+- Detecting user frustration
+- Measuring cognitive load
+- Dynamically simplifying interfaces
+- Generating React components using LLMs
+- Improving accessibility
+- Reducing user friction across enterprise applications
 
 ---
 
@@ -294,8 +299,8 @@ https://www.linkedin.com/in/disha-agarwalla-10884b31b/
 
 <div align="center">
 
-### ⭐ If you like this project, consider giving it a Star!
+⭐ **AuraGen is actively under development.**
 
-**AuraGen is actively under development. New features and improvements are being added regularly.**
+Every commit brings it closer to becoming a fully AI-powered Self-Healing User Interface.
 
 </div>
