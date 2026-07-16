@@ -1,37 +1,38 @@
-import OpenAI from "openai";
+import Groq from "groq-sdk";
 
-console.log("API Key Loaded:", !!process.env.OPENROUTER_API_KEY);
-
-const client = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1",
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
-export async function generateAIResponse(prompt: string): Promise<string> {
+export async function generateAIResponse(
+  prompt: string
+): Promise<string> {
   try {
-    console.log("Sending request to OpenRouter...");
+    console.log("================================");
+    console.log("Prompt:");
+    console.log(prompt);
+    console.log("================================");
 
-    const completion = await client.chat.completions.create({
-      model: "meta-llama/llama-3.2-3b-instruct:free",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
+    const completion =
+      await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      });
 
-    console.log("Complete Response:");
-    console.log(JSON.stringify(completion, null, 2));
+    const text =
+      completion.choices[0]?.message?.content ??
+      "No response";
 
-    return completion.choices[0].message.content ?? "No response";
-  } catch (err: any) {
-    console.log("STATUS:", err.status);
-    console.log("MESSAGE:", err.message);
-    console.log("ERROR:", err.error);
-    console.log("FULL ERROR:");
-    console.dir(err, { depth: null });
+    console.log(text);
 
-    throw err;
+    return text;
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
 }
