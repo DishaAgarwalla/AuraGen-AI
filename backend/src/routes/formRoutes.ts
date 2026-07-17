@@ -1,8 +1,15 @@
 import express from "express";
-import { submitForm } from "../controllers/formController";
+import { getForm } from "../controllers/formController";
 
 const router = express.Router();
 
-router.post("/", submitForm);
+/*
+====================================
+GET /api/form
+Returns current form
+====================================
+*/
+
+router.get("/", getForm);
 
 export default router;
