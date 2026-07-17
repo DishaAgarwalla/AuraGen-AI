@@ -1,19 +1,22 @@
 import { HumanMessage } from "@langchain/core/messages";
-import { llm } from "./llm";
 
-export async function generateAIResponse(
-  prompt: string
+import { llm } from "../services/llm";
+import { simplifyFormPrompt } from "../prompts/simplifyForm";
+
+export async function generateSimplifiedUI(
+  userPrompt: string
 ): Promise<string> {
   try {
     console.log("====================================");
-    console.log("🧠 AI Service");
+    console.log("🤖 UI Simplification Agent");
     console.log("====================================");
 
-    console.log("Prompt:");
-    console.log(prompt);
-
     const response = await llm.invoke([
-      new HumanMessage(prompt),
+      new HumanMessage(`
+${simplifyFormPrompt}
+
+${userPrompt}
+      `),
     ]);
 
     const content =
@@ -21,12 +24,16 @@ export async function generateAIResponse(
         ? response.content
         : JSON.stringify(response.content);
 
-    console.log("\nAI Response:");
+    console.log("Simplified UI:");
     console.log(content);
 
     return content;
   } catch (error) {
-    console.error("❌ AI Service Error:", error);
+    console.error(
+      "❌ UI Simplification Agent Error:",
+      error
+    );
+
     throw error;
   }
 }

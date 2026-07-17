@@ -1,30 +1,92 @@
 import { TelemetryData } from "../types/telemetry";
 import { calculateCognitiveLoad } from "../utils/cognitiveLoad";
+import { generateAdaptiveUI } from "./uiGenerationService";
+import { getFormContext } from "./formContextService";
+import { emitAdaptiveUI } from "../websocket/socket";
 
-export function processTelemetry(
+export async function processTelemetry(
   telemetry: TelemetryData
 ) {
+  /*
+  =====================================
+  Cognitive Load Analysis
+  =====================================
+  */
 
-  const result = calculateCognitiveLoad(telemetry);
+  const analysis = calculateCognitiveLoad(telemetry);
 
-  console.log("\n==============================");
+  console.log("\n====================================");
   console.log("📊 Cognitive Load Analysis");
-  console.log("==============================");
+  console.log("====================================");
 
-  console.log("Score :", result.score);
-  console.log("Status:", result.status);
+  console.log("Score :", analysis.score);
+  console.log("Status:", analysis.status);
 
   console.log("\nReasons:");
 
-  if (result.reasons.length === 0) {
+  if (analysis.reasons.length === 0) {
     console.log("• User seems comfortable.");
   } else {
-    result.reasons.forEach((reason) => {
-      console.log("•", reason);
-    });
+    analysis.reasons.forEach((reason) =>
+      console.log("•", reason)
+    );
   }
 
-  console.log("==============================\n");
+  console.log("====================================");
 
-  return result;
+  /*
+  =====================================
+  LOW / MEDIUM
+  =====================================
+  */
+
+  if (analysis.status !== "HIGH") {
+    return {
+      analysis,
+      adaptiveUI: null,
+    };
+  }
+
+  /*
+  =====================================
+  HIGH LOAD
+  =====================================
+  */
+
+  console.log("\n🚀 High Cognitive Load Detected");
+  console.log("Generating Adaptive UI...");
+
+  const form = getFormContext();
+
+  const formDescription = `
+Form Name:
+${form.formName}
+
+Description:
+${form.description}
+
+Fields:
+
+${form.fields.join("\n")}
+`;
+
+  const adaptiveUI = await generateAdaptiveUI(
+    formDescription,
+    analysis
+  );
+
+  /*
+  =====================================
+  Emit to Frontend
+  =====================================
+  */
+
+  emitAdaptiveUI(adaptiveUI);
+
+  console.log("\n✅ Adaptive UI emitted via WebSocket");
+
+  return {
+    analysis,
+    adaptiveUI,
+  };
 }
