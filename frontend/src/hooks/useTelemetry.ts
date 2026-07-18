@@ -4,24 +4,27 @@ import { useEffect, useRef, useState } from "react";
 import { sendTelemetry } from "@/services/api";
 
 export interface TelemetryData {
+  // Mouse Behaviour
   mouseMoves: number;
   clicks: number;
   rageClicks: number;
 
+  mouseX: number;
+  mouseY: number;
+  mouseSpeed: number;
+
+  // Keyboard Behaviour
   keyPresses: number;
   backspaces: number;
 
-  mouseX: number;
-  mouseY: number;
-
-  mouseSpeed: number;
-
+  // Timing
   idleTime: number;
-
   formDuration: number;
 
+  // Form Behaviour
   focusedField: string;
   averageFieldTime: number;
+  fieldsCompleted: number;
 }
 
 export default function useTelemetry() {
@@ -54,7 +57,7 @@ export default function useTelemetry() {
   const completedFields = useRef(0);
 
   //----------------------------------------------------
-  // Telemetry Ref (Source of Truth)
+  // Telemetry Ref
   //----------------------------------------------------
 
   const telemetryRef = useRef<TelemetryData>({
@@ -62,25 +65,25 @@ export default function useTelemetry() {
     clicks: 0,
     rageClicks: 0,
 
+    mouseX: 0,
+    mouseY: 0,
+    mouseSpeed: 0,
+
     keyPresses: 0,
     backspaces: 0,
 
-    mouseX: 0,
-    mouseY: 0,
-
-    mouseSpeed: 0,
-
     idleTime: 0,
-
     formDuration: 0,
 
     focusedField: "",
 
     averageFieldTime: 0,
+
+    fieldsCompleted: 0,
   });
 
   //----------------------------------------------------
-  // Optional State (For Debugging/UI)
+  // State
   //----------------------------------------------------
 
   const [telemetry, setTelemetry] =
@@ -95,7 +98,7 @@ export default function useTelemetry() {
   };
 
   //----------------------------------------------------
-  // Mouse Movement
+  // Mouse + Keyboard Tracking
   //----------------------------------------------------
 
   useEffect(() => {
@@ -111,7 +114,9 @@ export default function useTelemetry() {
       const dt = now - lastMouse.current.time;
 
       const speed =
-        dt > 0 ? Number((distance / dt).toFixed(2)) : 0;
+        dt > 0
+          ? Number((distance / dt).toFixed(2))
+          : 0;
 
       lastMouse.current = {
         x: e.clientX,
@@ -132,7 +137,7 @@ export default function useTelemetry() {
       updateTelemetry();
     };
 
-    //------------------------------------------------
+    //--------------------------------------------------
 
     const handleClick = () => {
       const now = Date.now();
@@ -153,9 +158,11 @@ export default function useTelemetry() {
       updateTelemetry();
     };
 
-    //------------------------------------------------
+    //--------------------------------------------------
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (
+      e: KeyboardEvent
+    ) => {
       lastInteraction.current = Date.now();
 
       telemetryRef.current.keyPresses++;
@@ -167,7 +174,7 @@ export default function useTelemetry() {
       updateTelemetry();
     };
 
-    //------------------------------------------------
+    //--------------------------------------------------
 
     window.addEventListener(
       "mousemove",
@@ -201,8 +208,7 @@ export default function useTelemetry() {
       );
     };
   }, []);
-
-  //----------------------------------------------------
+    //----------------------------------------------------
   // Field Focus Tracking
   //----------------------------------------------------
 
@@ -221,8 +227,14 @@ export default function useTelemetry() {
       telemetryRef.current.focusedField =
         target.name;
 
-      console.log("🟢 Focused:", target.name);
+      console.log(
+        `🟢 Focused Field: ${target.name}`
+      );
+
+      updateTelemetry();
     };
+
+    //--------------------------------------------------
 
     const onBlur = (e: Event) => {
       const target = e.target as HTMLInputElement;
@@ -234,6 +246,9 @@ export default function useTelemetry() {
 
       completedFields.current++;
 
+      telemetryRef.current.fieldsCompleted =
+        completedFields.current;
+
       telemetryRef.current.averageFieldTime =
         Math.round(
           totalFieldTime.current /
@@ -243,39 +258,58 @@ export default function useTelemetry() {
       console.log(
         `🔵 ${target.name} completed in ${(
           duration / 1000
-        ).toFixed(2)}s`
+        ).toFixed(2)} seconds`
       );
+
+      updateTelemetry();
     };
 
-    inputs.forEach((input) => {
-      input.addEventListener("focus", onFocus);
+    //--------------------------------------------------
 
-      input.addEventListener("blur", onBlur);
+    inputs.forEach((input) => {
+      input.addEventListener(
+        "focus",
+        onFocus
+      );
+
+      input.addEventListener(
+        "blur",
+        onBlur
+      );
     });
 
     return () => {
       inputs.forEach((input) => {
-        input.removeEventListener("focus", onFocus);
+        input.removeEventListener(
+          "focus",
+          onFocus
+        );
 
-        input.removeEventListener("blur", onBlur);
+        input.removeEventListener(
+          "blur",
+          onBlur
+        );
       });
     };
   }, []);
 
   //----------------------------------------------------
-  // Timers
+  // Idle Time + Form Duration
   //----------------------------------------------------
 
   useEffect(() => {
     const timer = setInterval(() => {
-      telemetryRef.current.idleTime = Math.floor(
-        (Date.now() - lastInteraction.current) /
-          1000
-      );
+      telemetryRef.current.idleTime =
+        Math.floor(
+          (Date.now() -
+            lastInteraction.current) /
+            1000
+        );
 
       telemetryRef.current.formDuration =
         Math.floor(
-          (Date.now() - formStartTime.current) /
+          (Date.now() -
+            formStartTime.current) /
             1000
         );
 
@@ -284,26 +318,57 @@ export default function useTelemetry() {
 
     return () => clearInterval(timer);
   }, []);
-
-  //----------------------------------------------------
-  // Send Telemetry
+    //----------------------------------------------------
+  // Send Telemetry to Backend
   //----------------------------------------------------
 
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        console.log(
-          "📤 Sending Telemetry..."
-        );
+        console.log("\n====================================");
+        console.log("📤 Sending Telemetry");
+        console.log("====================================");
 
         console.table(telemetryRef.current);
 
-        await sendTelemetry(
+        const response = await sendTelemetry(
           telemetryRef.current
         );
+
+        console.log("\n====================================");
+        console.log("📥 Backend Response");
+        console.log("====================================");
+
+        console.log(response);
+
+        //------------------------------------------------
+        // Cognitive Load
+        //------------------------------------------------
+
+        if (response?.cognitiveLoad) {
+          console.log("\n🧠 Cognitive Load");
+
+          console.table(response.cognitiveLoad);
+        }
+
+        //------------------------------------------------
+        // Adaptive UI
+        //------------------------------------------------
+
+        if (response?.adaptiveUI) {
+          console.log("\n🎨 Adaptive UI Generated");
+
+          console.log(response.adaptiveUI);
+
+          /*
+          Later this will be consumed by
+          useAdaptiveUI() / Socket.IO to
+          dynamically replace the form.
+          */
+        }
       } catch (error) {
         console.error(
-          "Telemetry Error:",
+          "\n❌ Failed to send telemetry:",
           error
         );
       }
@@ -312,6 +377,8 @@ export default function useTelemetry() {
     return () => clearInterval(interval);
   }, []);
 
+  //----------------------------------------------------
+  // Return Current Telemetry
   //----------------------------------------------------
 
   return telemetry;
