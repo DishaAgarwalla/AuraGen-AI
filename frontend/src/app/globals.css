@@ -1,12 +1,108 @@
 @import "tailwindcss";
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+/* ==============================
+   Global Reset
+================================= */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-  font-family:Arial, Helvetica, sans-serif;
-  background:#f1f5f9;
+/* ==============================
+   Root
+================================= */
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+/* ==============================
+   Body
+================================= */
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* ==============================
+   Links
+================================= */
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ==============================
+   Inputs
+================================= */
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ==============================
+   Scrollbar
+================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ==============================
+   Selection
+================================= */
+
+::selection {
+  background: #2563eb;
+  color: white;
+}
+
+/* ==============================
+   Animation
+================================= */
+
+.fade-in {
+  animation: fadeIn 0.35s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
