@@ -1,3 +1,5 @@
+"use client";
+
 type InputProps = {
   label: string;
   name: string;
@@ -32,7 +34,7 @@ export default function Input({
     <div className="flex flex-col gap-2">
       <label
         htmlFor={name}
-        className="font-medium text-gray-700"
+        className="font-medium text-slate-700"
       >
         {label}
       </label>
@@ -41,24 +43,30 @@ export default function Input({
         id={name}
         name={name}
         type={type}
-        placeholder={placeholder}
         value={value}
+        placeholder={placeholder}
+        autoComplete="off"
         onChange={onChange}
         onFocus={onFocus}
         onBlur={onBlur}
-        autoComplete="off"
         className="
+          w-full
+          rounded-xl
           border
-          border-gray-300
-          rounded-lg
+          border-slate-300
+          bg-white
           px-4
           py-3
-          outline-none
-          transition
+          shadow-sm
+          transition-all
           duration-200
+          outline-none
+
+          hover:border-blue-400
+
           focus:border-blue-500
-          focus:ring-2
-          focus:ring-blue-200
+          focus:ring-4
+          focus:ring-blue-100
         "
       />
     </div>
