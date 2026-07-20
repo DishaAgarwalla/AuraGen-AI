@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "AuraGen",
+  title: "AuraGen - AI Powered Self-Healing UI",
   description:
     "AuraGen - AI Powered Self-Healing User Interface using Cognitive Load Detection and Generative AI.",
   keywords: [
@@ -31,6 +33,11 @@ export const metadata: Metadata = {
       name: "Disha Agarwalla",
     },
   ],
+  openGraph: {
+    title: "AuraGen - AI Powered Self-Healing UI",
+    description: "Intelligent forms that adapt to your cognitive load",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -41,10 +48,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={`${inter.variable} ${spaceGrotesk.variable}`}
     >
-      <body className="min-h-screen bg-slate-100 text-slate-900 antialiased">
-        {children}
+      <body className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 text-slate-900 antialiased flex flex-col items-center">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {children}
+        </div>
       </body>
     </html>
   );
