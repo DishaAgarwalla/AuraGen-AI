@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-
 import {
   connectSocket,
   disconnectSocket,
@@ -11,26 +10,23 @@ import {
 export function useSocket() {
   useEffect(() => {
     connectSocket();
-
-    console.log("🔌 Connecting to Socket.IO...");
+    console.log("🔌 Socket.IO connected");
 
     listenAdaptiveUI((data) => {
-      console.log("📤 Adaptive UI Received");
-      console.log(data);
+      console.log("📤 Adaptive UI Received:", data);
     });
 
     listenCognitiveLoad((data) => {
-      console.log("🧠 Cognitive Load");
-      console.log(data);
+      console.log("🧠 Cognitive Load:", data);
     });
 
     listenNotification((data) => {
-      console.log("🔔 Notification");
-      console.log(data);
+      console.log("🔔 Notification:", data);
     });
 
     return () => {
       disconnectSocket();
+      console.log("🔌 Socket.IO disconnected");
     };
   }, []);
 }

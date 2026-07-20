@@ -8,7 +8,6 @@ export interface TelemetryData {
   mouseMoves: number;
   clicks: number;
   rageClicks: number;
-
   mouseX: number;
   mouseY: number;
   mouseSpeed: number;
@@ -33,11 +32,8 @@ export default function useTelemetry() {
   //----------------------------------------------------
 
   const formStartTime = useRef(Date.now());
-
   const lastInteraction = useRef(Date.now());
-
   const lastClickTime = useRef(0);
-
   const lastMouse = useRef({
     x: 0,
     y: 0,
@@ -49,11 +45,8 @@ export default function useTelemetry() {
   //----------------------------------------------------
 
   const currentField = useRef("");
-
   const fieldStartTime = useRef(0);
-
   const totalFieldTime = useRef(0);
-
   const completedFields = useRef(0);
 
   //----------------------------------------------------
@@ -64,21 +57,15 @@ export default function useTelemetry() {
     mouseMoves: 0,
     clicks: 0,
     rageClicks: 0,
-
     mouseX: 0,
     mouseY: 0,
     mouseSpeed: 0,
-
     keyPresses: 0,
     backspaces: 0,
-
     idleTime: 0,
     formDuration: 0,
-
     focusedField: "",
-
     averageFieldTime: 0,
-
     fieldsCompleted: 0,
   });
 
@@ -86,8 +73,10 @@ export default function useTelemetry() {
   // State
   //----------------------------------------------------
 
-  const [telemetry, setTelemetry] =
-    useState<TelemetryData>(telemetryRef.current);
+  const [telemetry, setTelemetry] = useState<TelemetryData>(telemetryRef.current);
+  const [isLoggingEnabled, setIsLoggingEnabled] = useState(
+    process.env.NODE_ENV === "development"
+  );
 
   //----------------------------------------------------
   // Sync State
@@ -98,25 +87,30 @@ export default function useTelemetry() {
   };
 
   //----------------------------------------------------
+  // Utility: Log with timestamp
+  //----------------------------------------------------
+
+  const logWithTimestamp = (emoji: string, message: string, data?: any) => {
+    if (!isLoggingEnabled) return;
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`[${timestamp}] ${emoji} ${message}`);
+    if (data) {
+      console.log(data);
+    }
+  };
+
+  //----------------------------------------------------
   // Mouse + Keyboard Tracking
   //----------------------------------------------------
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const now = Date.now();
-
       const dx = e.clientX - lastMouse.current.x;
-
       const dy = e.clientY - lastMouse.current.y;
-
       const distance = Math.sqrt(dx * dx + dy * dy);
-
       const dt = now - lastMouse.current.time;
-
-      const speed =
-        dt > 0
-          ? Number((distance / dt).toFixed(2))
-          : 0;
+      const speed = dt > 0 ? Number((distance / dt).toFixed(2)) : 0;
 
       lastMouse.current = {
         x: e.clientX,
@@ -125,14 +119,15 @@ export default function useTelemetry() {
       };
 
       lastInteraction.current = now;
-
       telemetryRef.current.mouseMoves++;
-
       telemetryRef.current.mouseX = e.clientX;
-
       telemetryRef.current.mouseY = e.clientY;
-
       telemetryRef.current.mouseSpeed = speed;
+
+      // Only log every 50th mouse move to reduce spam
+      if (telemetryRef.current.mouseMoves % 50 === 0) {
+        logWithTimestamp("🖱️", `Mouse moves: ${telemetryRef.current.mouseMoves}`);
+      }
 
       updateTelemetry();
     };
@@ -141,18 +136,18 @@ export default function useTelemetry() {
 
     const handleClick = () => {
       const now = Date.now();
-
-      const rageClick =
-        now - lastClickTime.current < 300;
-
+      const rageClick = now - lastClickTime.current < 300;
       lastClickTime.current = now;
-
       lastInteraction.current = now;
 
       telemetryRef.current.clicks++;
-
       if (rageClick) {
         telemetryRef.current.rageClicks++;
+        logWithTimestamp("⚠️", `Rage click detected! Total: ${telemetryRef.current.rageClicks}`);
+      }
+
+      if (telemetryRef.current.clicks % 5 === 0) {
+        logWithTimestamp("👆", `Total clicks: ${telemetryRef.current.clicks}`);
       }
 
       updateTelemetry();
@@ -160,15 +155,17 @@ export default function useTelemetry() {
 
     //--------------------------------------------------
 
-    const handleKeyDown = (
-      e: KeyboardEvent
-    ) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       lastInteraction.current = Date.now();
-
       telemetryRef.current.keyPresses++;
 
       if (e.key === "Backspace") {
         telemetryRef.current.backspaces++;
+        logWithTimestamp("⌨️", `Backspace pressed: ${telemetryRef.current.backspaces}`);
+      }
+
+      if (telemetryRef.current.keyPresses % 20 === 0) {
+        logWithTimestamp("⌨️", `Total key presses: ${telemetryRef.current.keyPresses}`);
       }
 
       updateTelemetry();
@@ -176,61 +173,34 @@ export default function useTelemetry() {
 
     //--------------------------------------------------
 
-    window.addEventListener(
-      "mousemove",
-      handleMouseMove
-    );
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("click", handleClick);
+    window.addEventListener("keydown", handleKeyDown);
 
-    window.addEventListener(
-      "click",
-      handleClick
-    );
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    logWithTimestamp("🚀", "Telemetry tracking started");
 
     return () => {
-      window.removeEventListener(
-        "mousemove",
-        handleMouseMove
-      );
-
-      window.removeEventListener(
-        "click",
-        handleClick
-      );
-
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("click", handleClick);
+      window.removeEventListener("keydown", handleKeyDown);
+      logWithTimestamp("🛑", "Telemetry tracking stopped");
     };
-  }, []);
-    //----------------------------------------------------
+  }, [isLoggingEnabled]);
+
+  //----------------------------------------------------
   // Field Focus Tracking
   //----------------------------------------------------
 
   useEffect(() => {
-    const inputs = document.querySelectorAll(
-      "input, select, textarea"
-    );
+    const inputs = document.querySelectorAll("input, select, textarea");
 
     const onFocus = (e: Event) => {
       const target = e.target as HTMLInputElement;
-
       currentField.current = target.name;
-
       fieldStartTime.current = Date.now();
+      telemetryRef.current.focusedField = target.name;
 
-      telemetryRef.current.focusedField =
-        target.name;
-
-      console.log(
-        `🟢 Focused Field: ${target.name}`
-      );
-
+      logWithTimestamp("🟢", `Focused Field: ${target.name}`);
       updateTelemetry();
     };
 
@@ -238,28 +208,22 @@ export default function useTelemetry() {
 
     const onBlur = (e: Event) => {
       const target = e.target as HTMLInputElement;
-
-      const duration =
-        Date.now() - fieldStartTime.current;
-
-      totalFieldTime.current += duration;
-
-      completedFields.current++;
-
-      telemetryRef.current.fieldsCompleted =
-        completedFields.current;
-
-      telemetryRef.current.averageFieldTime =
-        Math.round(
-          totalFieldTime.current /
-            completedFields.current
+      const duration = Date.now() - fieldStartTime.current;
+      
+      if (duration > 0) {
+        totalFieldTime.current += duration;
+        completedFields.current++;
+        telemetryRef.current.fieldsCompleted = completedFields.current;
+        telemetryRef.current.averageFieldTime = Math.round(
+          totalFieldTime.current / completedFields.current
         );
 
-      console.log(
-        `🔵 ${target.name} completed in ${(
-          duration / 1000
-        ).toFixed(2)} seconds`
-      );
+        logWithTimestamp(
+          "🔵", 
+          `${target.name} completed in ${(duration / 1000).toFixed(2)}s`,
+          { avgTime: `${(telemetryRef.current.averageFieldTime / 1000).toFixed(2)}s` }
+        );
+      }
 
       updateTelemetry();
     };
@@ -267,31 +231,19 @@ export default function useTelemetry() {
     //--------------------------------------------------
 
     inputs.forEach((input) => {
-      input.addEventListener(
-        "focus",
-        onFocus
-      );
-
-      input.addEventListener(
-        "blur",
-        onBlur
-      );
+      input.addEventListener("focus", onFocus);
+      input.addEventListener("blur", onBlur);
     });
+
+    logWithTimestamp("📋", `Tracking ${inputs.length} form fields`);
 
     return () => {
       inputs.forEach((input) => {
-        input.removeEventListener(
-          "focus",
-          onFocus
-        );
-
-        input.removeEventListener(
-          "blur",
-          onBlur
-        );
+        input.removeEventListener("focus", onFocus);
+        input.removeEventListener("blur", onBlur);
       });
     };
-  }, []);
+  }, [isLoggingEnabled]);
 
   //----------------------------------------------------
   // Idle Time + Form Duration
@@ -299,87 +251,135 @@ export default function useTelemetry() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      telemetryRef.current.idleTime =
-        Math.floor(
-          (Date.now() -
-            lastInteraction.current) /
-            1000
-        );
+      const currentIdleTime = Math.floor(
+        (Date.now() - lastInteraction.current) / 1000
+      );
+      const currentFormDuration = Math.floor(
+        (Date.now() - formStartTime.current) / 1000
+      );
 
-      telemetryRef.current.formDuration =
-        Math.floor(
-          (Date.now() -
-            formStartTime.current) /
-            1000
-        );
+      telemetryRef.current.idleTime = currentIdleTime;
+      telemetryRef.current.formDuration = currentFormDuration;
+
+      // Log idle time warnings
+      if (currentIdleTime > 30 && currentIdleTime % 10 === 0) {
+        logWithTimestamp("💤", `User idle for ${currentIdleTime}s`);
+      }
 
       updateTelemetry();
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
-    //----------------------------------------------------
+  }, [isLoggingEnabled]);
+
+  //----------------------------------------------------
   // Send Telemetry to Backend
   //----------------------------------------------------
 
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        console.log("\n====================================");
-        console.log("📤 Sending Telemetry");
-        console.log("====================================");
+        const payload = {
+          ...telemetryRef.current,
+          timestamp: new Date().toISOString(),
+        };
 
-        console.table(telemetryRef.current);
-
-        const response = await sendTelemetry(
-          telemetryRef.current
-        );
-
-        console.log("\n====================================");
-        console.log("📥 Backend Response");
-        console.log("====================================");
-
-        console.log(response);
-
-        //------------------------------------------------
-        // Cognitive Load
-        //------------------------------------------------
-
-        if (response?.cognitiveLoad) {
-          console.log("\n🧠 Cognitive Load");
-
-          console.table(response.cognitiveLoad);
+        // Only log summary in development
+        if (isLoggingEnabled) {
+          console.log("\n📊 ============ TELEMETRY SUMMARY ============");
+          console.log(`📈 Mouse Moves: ${payload.mouseMoves}`);
+          console.log(`🖱️  Clicks: ${payload.clicks} (Rage: ${payload.rageClicks})`);
+          console.log(`⌨️  Key Presses: ${payload.keyPresses} (Backspaces: ${payload.backspaces})`);
+          console.log(`⏱️  Form Duration: ${payload.formDuration}s (Idle: ${payload.idleTime}s)`);
+          console.log(`📝 Fields Completed: ${payload.fieldsCompleted}`);
+          console.log(`⏳ Avg Field Time: ${(payload.averageFieldTime / 1000).toFixed(2)}s`);
+          console.log(`🎯 Current Field: ${payload.focusedField || "None"}`);
+          console.log("=============================================\n");
         }
 
-        //------------------------------------------------
-        // Adaptive UI
-        //------------------------------------------------
+        const response = await sendTelemetry(payload);
+
+        if (isLoggingEnabled) {
+          //------------------------------------------------
+          // Cognitive Load
+          //------------------------------------------------
+          if (response?.cognitiveLoad) {
+            const { score, status, reasons } = response.cognitiveLoad;
+            const statusEmoji = status === "HIGH" ? "🔴" : status === "MEDIUM" ? "🟡" : "🟢";
+            
+            console.log("\n🧠 ============ COGNITIVE LOAD ============");
+            console.log(`${statusEmoji} Status: ${status}`);
+            console.log(`📊 Score: ${score}/100`);
+            if (reasons && reasons.length > 0) {
+              console.log("📝 Reasons:");
+              reasons.forEach((reason: string, index: number) => {
+                console.log(`   ${index + 1}. ${reason}`);
+              });
+            }
+            console.log("===========================================\n");
+          }
+
+          //------------------------------------------------
+          // Adaptive UI
+          //------------------------------------------------
+          if (response?.adaptiveUI) {
+            console.log("\n🎨 ============ ADAPTIVE UI ============");
+            console.log(`🚀 Generated at: ${new Date().toLocaleTimeString()}`);
+            console.log(`📊 Cognitive Score: ${response.adaptiveUI.cognitiveScore}`);
+            console.log(`📝 Status: ${response.adaptiveUI.status}`);
+            console.log("=========================================\n");
+          }
+        }
 
         if (response?.adaptiveUI) {
-          console.log("\n🎨 Adaptive UI Generated");
-
-          console.log(response.adaptiveUI);
-
-          /*
-          Later this will be consumed by
-          useAdaptiveUI() / Socket.IO to
-          dynamically replace the form.
-          */
+          // This will be consumed by useAdaptiveUI() / Socket.IO
+          // Store in localStorage for debugging
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(
+              new CustomEvent("adaptiveUI", { detail: response.adaptiveUI })
+            );
+          }
         }
+
       } catch (error) {
-        console.error(
-          "\n❌ Failed to send telemetry:",
-          error
-        );
+        if (isLoggingEnabled) {
+          console.error("❌ Failed to send telemetry:", error);
+        }
       }
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isLoggingEnabled]);
 
   //----------------------------------------------------
   // Return Current Telemetry
   //----------------------------------------------------
 
-  return telemetry;
+  return {
+    telemetry,
+    getTelemetrySnapshot: () => ({ ...telemetryRef.current }),
+    resetTelemetry: () => {
+      telemetryRef.current = {
+        mouseMoves: 0,
+        clicks: 0,
+        rageClicks: 0,
+        mouseX: 0,
+        mouseY: 0,
+        mouseSpeed: 0,
+        keyPresses: 0,
+        backspaces: 0,
+        idleTime: 0,
+        formDuration: 0,
+        focusedField: "",
+        averageFieldTime: 0,
+        fieldsCompleted: 0,
+      };
+      updateTelemetry();
+      logWithTimestamp("🔄", "Telemetry has been reset");
+    },
+    toggleLogging: () => {
+      setIsLoggingEnabled(!isLoggingEnabled);
+      logWithTimestamp("🔊", `Logging ${!isLoggingEnabled ? "enabled" : "disabled"}`);
+    },
+  };
 }
