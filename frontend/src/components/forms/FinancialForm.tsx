@@ -1,447 +1,335 @@
 "use client";
 
-import { useRef, useState } from "react";
-
-import Button from "../ui/Button";
-import Card from "../ui/Card";
-import Checkbox from "../ui/Checkbox";
-import Input from "../ui/Input";
-import Select from "../ui/Select";
-
+import { useState } from "react";
+import { submitFinancialForm } from "@/services/api";
+import useTelemetry from "@/hooks/useTelemetry";
+import { useSocket } from "@/hooks/useSocket";
+import useAdaptiveUI from "@/hooks/useAdaptiveUI";
 import ProgressIndicator from "../adaptive/ProgressIndicator";
 import AdaptiveRenderer from "../adaptive/AdaptiveRenderer";
-import FieldHelp from "../adaptive/FieldHelp";
 
-import { submitFinancialForm } from "@/services/api";
-
-import useTelemetry from "@/hooks/useTelemetry";
-import useSocket from "@/hooks/useSocket";
-import useAdaptiveUI from "@/hooks/useAdaptiveUI";
-
-export default function FinancialForm() {
-  //----------------------------------------------------
-  // Hooks
-  //----------------------------------------------------
-
+export default function NewFinancialForm() {
   useTelemetry();
+  useSocket();
+  const { adaptiveUI } = useAdaptiveUI();
 
-  const socketData = useSocket();
-
- const {
-  adaptiveUI,
-} = useAdaptiveUI();
-
-  //----------------------------------------------------
-  // Refs
-  //----------------------------------------------------
-
-  const fieldStartTime =
-    useRef<Record<string, number>>({});
-
-  //----------------------------------------------------
-  // State
-  //----------------------------------------------------
-
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-
-  const [formData, setFormData] = useState({
-    fullName: "",
+  const [success, setSuccess] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
     email: "",
     phone: "",
     dob: "",
-
     occupation: "",
     income: "",
-    employment: "",
-    goal: "",
-
     pan: "",
     account: "",
     ifsc: "",
-    aadhaar: "",
-
-    agree: false,
+    terms: false,
   });
 
-  //----------------------------------------------------
-  // Input Change
-  //----------------------------------------------------
+  const totalSteps = 3;
+  const progress = (step / totalSteps) * 100;
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement
-    >
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-
-    setFormData((prev) => ({
+    setForm(prev => ({
       ...prev,
-      [name]:
-        type === "checkbox"
-          ? (e.target as HTMLInputElement).checked
-          : value,
+      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value
     }));
   };
 
-  //----------------------------------------------------
-  // Focus Tracking
-  //----------------------------------------------------
-
-  const handleFocus = (
-    e: React.FocusEvent<HTMLInputElement>
-  ) => {
-    fieldStartTime.current[e.target.name] =
-      Date.now();
-
-    console.log(
-      `🟢 Focused: ${e.target.name}`
-    );
+  const nextStep = () => {
+    if (step < totalSteps) setStep(step + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  //----------------------------------------------------
-  // Blur Tracking
-  //----------------------------------------------------
-
-  const handleBlur = (
-    e: React.FocusEvent<HTMLInputElement>
-  ) => {
-    const start =
-      fieldStartTime.current[e.target.name] ??
-      Date.now();
-
-    const duration = (
-      (Date.now() - start) /
-      1000
-    ).toFixed(2);
-
-    console.log(
-      `🔵 ${e.target.name} completed in ${duration}s`
-    );
+  const prevStep = () => {
+    if (step > 1) setStep(step - 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  //----------------------------------------------------
-  // Submit
-  //----------------------------------------------------
-
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    if (!form.terms) {
+      alert("Please accept the terms to continue");
+      return;
+    }
+    setLoading(true);
     try {
-      setLoading(true);
-
-      const response =
-        await submitFinancialForm(formData);
-
-      console.log(
-        "Backend Response:",
-        response
-      );
-
-      alert(
-        "🎉 Form Submitted Successfully!"
-      );
+      await submitFinancialForm(form);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 5000);
     } catch (error) {
-      console.error(error);
-
-      alert(
-        "❌ Failed to submit form."
-      );
+      alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  //----------------------------------------------------
-  // UI
-  //----------------------------------------------------
-
   return (
     <>
-      <AdaptiveRenderer
-        adaptiveUI={adaptiveUI}
-      />
+      <AdaptiveRenderer adaptiveUI={adaptiveUI} />
+      
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-3xl">
+          {/* Main Card */}
+          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-2xl font-bold text-white">AuraGen</h1>
+                  <p className="text-blue-100 text-sm mt-1">Smart Financial Onboarding</p>
+                </div>
+                <div className="bg-white/20 backdrop-blur px-4 py-2 rounded-full">
+                  <span className="text-white text-sm font-medium">Step {step} of {totalSteps}</span>
+                </div>
+              </div>
+            </div>
 
-      <Card>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-8"
-        >
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-blue-700">
-              AuraGen
-            </h1>
+            {/* Body */}
+            <div className="p-8">
+              {/* Progress Bar */}
+              <div className="mb-8">
+                <div className="flex justify-between text-sm text-gray-500 mb-2">
+                  <span>Progress</span>
+                  <span className="font-medium text-blue-600">{Math.round(progress)}%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500 rounded-full"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
 
-            <p className="mt-2 text-gray-500">
-              Financial Onboarding Form
+              {/* Cognitive Load */}
+              <div className="mb-8">
+                <ProgressIndicator
+                  score={adaptiveUI?.cognitiveScore ?? 0}
+                  status={adaptiveUI?.status ?? "LOW"}
+                />
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit}>
+                {step === 1 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                      <span className="text-2xl">👤</span> Personal Information
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          Full Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="name"
+                          value={form.name}
+                          onChange={handleChange}
+                          placeholder="John Doe"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          Email <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="email"
+                          type="email"
+                          value={form.email}
+                          onChange={handleChange}
+                          placeholder="john@example.com"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          Phone <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="phone"
+                          value={form.phone}
+                          onChange={handleChange}
+                          placeholder="+1 234 567 890"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          Date of Birth <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="dob"
+                          type="date"
+                          value={form.dob}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                      <span className="text-2xl">💼</span> Professional Details
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          Occupation <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="occupation"
+                          value={form.occupation}
+                          onChange={handleChange}
+                          placeholder="Software Engineer"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          Annual Income (₹) <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="income"
+                          value={form.income}
+                          onChange={handleChange}
+                          placeholder="10,00,000"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                      <span className="text-2xl">🏦</span> Financial Information
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          PAN Number <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="pan"
+                          value={form.pan}
+                          onChange={handleChange}
+                          placeholder="ABCDE1234F"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          Bank Account <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="account"
+                          value={form.account}
+                          onChange={handleChange}
+                          placeholder="XXXXXXXXXXXX"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          IFSC Code <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="ifsc"
+                          value={form.ifsc}
+                          onChange={handleChange}
+                          placeholder="SBIN0001234"
+                          className="w-full max-w-md px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Navigation Buttons */}
+                <div className="mt-8 pt-6 border-t border-gray-100 flex gap-3">
+                  {step > 1 && (
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="px-6 py-2.5 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-xl transition-all font-medium"
+                    >
+                      ← Back
+                    </button>
+                  )}
+                  <div className="flex-1" />
+                  {step < totalSteps ? (
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all shadow-md hover:shadow-lg"
+                    >
+                      Continue →
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-8 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loading ? "Submitting..." : "Submit Application"}
+                    </button>
+                  )}
+                </div>
+
+                {/* Terms */}
+                {step === totalSteps && (
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        name="terms"
+                        checked={form.terms}
+                        onChange={handleChange}
+                        className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      />
+                      <label className="text-sm text-gray-600 cursor-pointer">
+                        I agree to the <span className="text-blue-600 font-medium">Terms & Conditions</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* Success Message */}
+                {success && (
+                  <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-center font-medium">
+                    ✅ Application submitted successfully!
+                  </div>
+                )}
+              </form>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-400">
+              Built with ❤️ using Next.js, TypeScript, LangChain, Groq & Socket.IO
             </p>
           </div>
-
-          <ProgressIndicator
-            score={adaptiveUI?.cognitiveScore ?? 0}
-            status={adaptiveUI?.status ?? "LOW"}
-          />
-
-          {/* Personal Information */}
-
-          <div>
-            <h2 className="mb-5 text-xl font-semibold">
-              Personal Information
-            </h2>
-
-            <div className="grid gap-5 md:grid-cols-2">
-                            <div>
-                <Input
-                  label="Full Name"
-                  name="fullName"
-                  placeholder="John Doe"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="Full Name" />
-              </div>
-
-              <div>
-                <Input
-                  label="Email"
-                  name="email"
-                  type="email"
-                  placeholder="john@gmail.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="Email Address" />
-              </div>
-
-              <div>
-                <Input
-                  label="Phone Number"
-                  name="phone"
-                  placeholder="+91 XXXXX XXXXX"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="Phone Number" />
-              </div>
-
-              <div>
-                <Input
-                  label="Date of Birth"
-                  name="dob"
-                  type="date"
-                  value={formData.dob}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="Date of Birth" />
-              </div>
-
-            </div>
-          </div>
-
-          {/* Professional Information */}
-
-          <div>
-            <h2 className="mb-5 text-xl font-semibold">
-              Professional Information
-            </h2>
-
-            <div className="grid gap-5 md:grid-cols-2">
-
-              <div>
-                <Input
-                  label="Occupation"
-                  name="occupation"
-                  placeholder="Software Engineer"
-                  value={formData.occupation}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="Occupation" />
-              </div>
-
-              <div>
-                <Input
-                  label="Annual Income"
-                  name="income"
-                  placeholder="₹ 10,00,000"
-                  value={formData.income}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="Annual Income" />
-              </div>
-
-              <div>
-                <Select
-                  label="Employment Type"
-                  name="employment"
-                  value={formData.employment}
-                  onChange={handleChange}
-                  options={[
-                    "Select",
-                    "Salaried",
-                    "Self Employed",
-                    "Business",
-                    "Student",
-                  ]}
-                />
-
-                <FieldHelp fieldName="Employment Type" />
-              </div>
-
-              <div>
-                <Select
-                  label="Investment Goal"
-                  name="goal"
-                  value={formData.goal}
-                  onChange={handleChange}
-                  options={[
-                    "Select",
-                    "Retirement",
-                    "Wealth Creation",
-                    "Tax Saving",
-                    "Emergency Fund",
-                  ]}
-                />
-
-                <FieldHelp fieldName="Investment Goal" />
-              </div>
-
-            </div>
-          </div>
-
-          {/* Financial Information */}
-
-          <div>
-            <h2 className="mb-5 text-xl font-semibold">
-              Financial Information
-            </h2>
-
-            <div className="grid gap-5 md:grid-cols-2"></div>
-                          <div>
-                <Input
-                  label="PAN Number"
-                  name="pan"
-                  placeholder="ABCDE1234F"
-                  value={formData.pan}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="PAN Number" />
-              </div>
-
-              <div>
-                <Input
-                  label="Bank Account Number"
-                  name="account"
-                  placeholder="XXXXXXXXXXXX"
-                  value={formData.account}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="Bank Account Number" />
-              </div>
-
-              <div>
-                <Input
-                  label="IFSC Code"
-                  name="ifsc"
-                  placeholder="SBIN0001234"
-                  value={formData.ifsc}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="IFSC Code" />
-              </div>
-
-              <div>
-                <Input
-                  label="Aadhaar Number"
-                  name="aadhaar"
-                  placeholder="XXXX XXXX XXXX"
-                  value={formData.aadhaar}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-
-                <FieldHelp fieldName="Aadhaar Number" />
-              </div>
-
-            </div>
-          
-
-          {/* Adaptive UI Notification */}
-
-          {adaptiveUI && (
-            <div className="rounded-xl border border-yellow-300 bg-yellow-50 p-5">
-              <h3 className="text-lg font-semibold text-yellow-700">
-                ⚡ Adaptive UI Activated
-              </h3>
-
-              <p className="mt-2 text-sm text-gray-700">
-                AuraGen detected a high cognitive load and
-                generated a simplified version of the interface.
-              </p>
-
-              <div className="mt-4 rounded-lg bg-white p-4 shadow">
-                <p className="text-sm">
-                  <strong>Cognitive Score:</strong>{" "}
-                  {adaptiveUI.cognitiveScore}
-                </p>
-
-                <p className="text-sm">
-                  <strong>Status:</strong>{" "}
-                  {adaptiveUI.status}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Agreement */}
-
-          <Checkbox
-            label="I agree to the Terms & Conditions."
-            name="agree"
-            checked={formData.agree}
-            onChange={handleChange}
-          />
-
-          {/* Submit */}
-
-          <Button
-            type="submit"
-            text={
-              loading
-                ? "Submitting..."
-                : "Submit Application"
-            }
-          />
-        </form>
-      </Card>
+        </div>
+      </div>
     </>
   );
 }
