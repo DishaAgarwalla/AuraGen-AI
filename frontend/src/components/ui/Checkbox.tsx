@@ -2,9 +2,7 @@ type CheckboxProps = {
   label: string;
   name: string;
   checked: boolean;
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function Checkbox({
@@ -14,25 +12,15 @@ export default function Checkbox({
   onChange,
 }: CheckboxProps) {
   return (
-    <label className="flex items-start gap-3 cursor-pointer">
+    <label className="flex items-center gap-3 cursor-pointer group">
       <input
         type="checkbox"
         name={name}
         checked={checked}
         onChange={onChange}
-        className="
-          mt-1
-          h-5
-          w-5
-          rounded
-          border-gray-300
-          text-blue-600
-          focus:ring-2
-          focus:ring-blue-400
-        "
+        className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
       />
-
-      <span className="text-gray-700 leading-6">
+      <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
         {label}
       </span>
     </label>

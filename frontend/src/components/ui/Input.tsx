@@ -6,18 +6,8 @@ type InputProps = {
   type?: string;
   placeholder?: string;
   value: string;
-
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
-
-  onFocus?: (
-    e: React.FocusEvent<HTMLInputElement>
-  ) => void;
-
-  onBlur?: (
-    e: React.FocusEvent<HTMLInputElement>
-  ) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
 };
 
 export default function Input({
@@ -27,47 +17,21 @@ export default function Input({
   placeholder,
   value,
   onChange,
-  onFocus,
-  onBlur,
+  required = false,
 }: InputProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <label
-        htmlFor={name}
-        className="font-medium text-slate-700"
-      >
-        {label}
+    <div className="space-y-1">
+      <label htmlFor={name} className="text-sm font-medium text-gray-700">
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
-
       <input
         id={name}
         name={name}
         type={type}
         value={value}
         placeholder={placeholder}
-        autoComplete="off"
         onChange={onChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        className="
-          w-full
-          rounded-xl
-          border
-          border-slate-300
-          bg-white
-          px-4
-          py-3
-          shadow-sm
-          transition-all
-          duration-200
-          outline-none
-
-          hover:border-blue-400
-
-          focus:border-blue-500
-          focus:ring-4
-          focus:ring-blue-100
-        "
+        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-800 placeholder-gray-400"
       />
     </div>
   );
