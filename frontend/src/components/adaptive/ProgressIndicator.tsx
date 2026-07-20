@@ -11,67 +11,94 @@ export default function ProgressIndicator({
 }: ProgressIndicatorProps) {
   const barColor =
     status === "HIGH"
-      ? "bg-red-500"
+      ? "bg-gradient-to-r from-red-400 to-red-600"
       : status === "MEDIUM"
-      ? "bg-yellow-500"
-      : "bg-green-500";
+      ? "bg-gradient-to-r from-amber-400 to-amber-600"
+      : "bg-gradient-to-r from-emerald-400 to-emerald-600";
 
   const statusColor =
     status === "HIGH"
-      ? "text-red-600"
+      ? "text-red-600 bg-red-50 border-red-200/50"
       : status === "MEDIUM"
-      ? "text-yellow-600"
-      : "text-green-600";
+      ? "text-amber-600 bg-amber-50 border-amber-200/50"
+      : "text-emerald-600 bg-emerald-50 border-emerald-200/50";
+
+  const statusEmoji =
+    status === "HIGH"
+      ? "🔴"
+      : status === "MEDIUM"
+      ? "🟡"
+      : "🟢";
+
+  const statusMessages = {
+    LOW: "User is navigating the form comfortably. 🎯",
+    MEDIUM: "User is showing signs of hesitation. Monitor interaction. 👀",
+    HIGH: "High cognitive load detected. Adaptive UI has been triggered. ⚡",
+  };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
+    <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm p-6 shadow-lg shadow-slate-200/50">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-800">
-          Cognitive Load
-        </h2>
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🧠</span>
+          <h2 className="text-base font-bold text-slate-800">
+            Cognitive Load
+          </h2>
+        </div>
 
         <span
-          className={`rounded-full px-3 py-1 text-sm font-semibold ${statusColor} bg-slate-100`}
+          className={`
+            rounded-full
+            px-3
+            py-1
+            text-xs
+            font-semibold
+            border
+            ${statusColor}
+            flex
+            items-center
+            gap-1.5
+          `}
         >
+          <span>{statusEmoji}</span>
           {status}
         </span>
       </div>
 
-      <div className="h-4 overflow-hidden rounded-full bg-slate-200">
-        <div
-          className={`${barColor} h-full rounded-full transition-all duration-700`}
-          style={{
-            width: `${score}%`,
-          }}
-        />
+      {/* Progress Bar */}
+      <div className="relative">
+        <div className="h-2.5 overflow-hidden rounded-full bg-slate-200/80">
+          <div
+            className={`${barColor} h-full rounded-full transition-all duration-1000 ease-out`}
+            style={{
+              width: `${score}%`,
+            }}
+          />
+        </div>
+
+        {/* Score markers */}
+        <div className="absolute -bottom-5 left-0 right-0 flex justify-between text-[10px] text-slate-400">
+          <span>0</span>
+          <span>25</span>
+          <span>50</span>
+          <span>75</span>
+          <span>100</span>
+        </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
-        <span>Score</span>
-
-        <span className="font-semibold">
+      {/* Score display */}
+      <div className="mt-6 flex items-center justify-between text-sm">
+        <span className="text-slate-500 font-medium">Score</span>
+        <span className="font-bold text-slate-800 bg-slate-100 px-3 py-1 rounded-lg">
           {score}/100
         </span>
       </div>
 
-      <div className="mt-4">
-        {status === "LOW" && (
-          <p className="text-sm text-green-700">
-            User is navigating the form comfortably.
-          </p>
-        )}
-
-        {status === "MEDIUM" && (
-          <p className="text-sm text-yellow-700">
-            User is showing signs of hesitation. Monitor interaction.
-          </p>
-        )}
-
-        {status === "HIGH" && (
-          <p className="text-sm text-red-700">
-            High cognitive load detected. Adaptive UI has been triggered.
-          </p>
-        )}
+      {/* Status message */}
+      <div className="mt-3 p-3 rounded-lg bg-slate-50/80 border border-slate-200/50">
+        <p className="text-sm text-slate-600">
+          {statusMessages[status]}
+        </p>
       </div>
     </div>
   );
