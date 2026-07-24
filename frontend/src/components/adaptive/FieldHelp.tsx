@@ -25,7 +25,7 @@ export default function FieldHelp({
       const response = await generateAIResponse(
         `Explain the financial form field "${fieldName}" in simple language for a beginner. Keep the explanation under 40 words.`
       );
-      setHelp(response.response);
+      setHelp(response.response || response.message || "No explanation available.");
       setIsVisible(true);
     } catch (error) {
       console.error("Explain Field Error:", error);
@@ -81,9 +81,9 @@ export default function FieldHelp({
             to-indigo-50/60
             p-3
             text-sm
-            text-slate-700
+            text-gray-700
             shadow-sm
-            slide-in
+            fade-in
           "
         >
           <div className="flex items-start gap-2">
