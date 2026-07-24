@@ -10,21 +10,12 @@ export default function Card({
   return (
     <div
       className={`
-        w-full
-        max-w-4xl
-        mx-auto
+        bg-white
         rounded-3xl
-        bg-white/90
-        backdrop-blur-xl
-        shadow-2xl
+        shadow-xl
         border
-        border-slate-200/50
-        p-8
-        sm:p-10
-        lg:p-12
-        transition-all
-        duration-300
-        hover:shadow-[0_20px_60px_-15px_rgba(59,130,246,0.15)]
+        border-gray-100
+        overflow-hidden
         ${className}
       `}
     >
