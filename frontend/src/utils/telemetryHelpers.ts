@@ -1,12 +1,5 @@
 /**
  * Calculate mouse speed between two points
- * @param previousX - Previous X coordinate
- * @param previousY - Previous Y coordinate  
- * @param currentX - Current X coordinate
- * @param currentY - Current Y coordinate
- * @param previousTime - Previous timestamp in ms
- * @param currentTime - Current timestamp in ms
- * @returns Speed in pixels per millisecond
  */
 export function calculateMouseSpeed(
   previousX: number,
@@ -30,8 +23,6 @@ export function calculateMouseSpeed(
 
 /**
  * Calculate idle time since last activity
- * @param lastActivityTime - Timestamp of last activity in ms
- * @returns Idle time in milliseconds
  */
 export function calculateIdleTime(
   lastActivityTime: number
@@ -41,9 +32,6 @@ export function calculateIdleTime(
 
 /**
  * Detect if a click is a "rage click" (repeated clicks within 300ms)
- * @param previousClickTime - Timestamp of previous click in ms
- * @param currentClickTime - Timestamp of current click in ms
- * @returns True if it's a rage click
  */
 export function isRageClick(
   previousClickTime: number,
@@ -54,8 +42,6 @@ export function isRageClick(
 
 /**
  * Calculate duration spent on a field
- * @param focusTime - Timestamp when field was focused in ms
- * @returns Duration in milliseconds
  */
 export function calculateFieldDuration(
   focusTime: number
@@ -65,9 +51,6 @@ export function calculateFieldDuration(
 
 /**
  * Calculate average field time
- * @param totalTime - Total time spent on all fields in ms
- * @param completedFields - Number of completed fields
- * @returns Average time per field in ms
  */
 export function calculateAverageFieldTime(
   totalTime: number,
@@ -79,8 +62,6 @@ export function calculateAverageFieldTime(
 
 /**
  * Format duration for display
- * @param ms - Duration in milliseconds
- * @returns Formatted string (e.g., "2.5s" or "1m 30s")
  */
 export function formatDuration(ms: number): string {
   const seconds = Math.floor(ms / 1000);
