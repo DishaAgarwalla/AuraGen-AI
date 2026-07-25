@@ -7,6 +7,7 @@ export interface CognitiveLoad {
 export interface AdaptiveUI {
   simplifiedUI: string;
   generatedCode: string;
+  generatedUI?: string;
   cognitiveScore: number;
   status: "LOW" | "MEDIUM" | "HIGH";
 }

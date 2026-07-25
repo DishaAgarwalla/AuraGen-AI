@@ -18,4 +18,5 @@ export interface TelemetryData {
   // Form Behaviour
   averageFieldTime: number;
   fieldsCompleted: number;
+  focusedField?: string;
 }
