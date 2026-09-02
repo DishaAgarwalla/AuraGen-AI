@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { processTelemetry } from "../services/telemetryService";
 
-export const receiveTelemetry = async (
+export const receiveTelemetry = async ( 
   req: Request,
   res: Response
 ): Promise<void> => {
