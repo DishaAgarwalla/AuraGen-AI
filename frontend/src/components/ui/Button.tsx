@@ -1,5 +1,5 @@
 type ButtonProps = {
-  text: string;
+  text: string; 
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
   variant?: "primary" | "secondary" | "gradient";
