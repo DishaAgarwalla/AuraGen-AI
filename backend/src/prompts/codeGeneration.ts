@@ -1,4 +1,4 @@
-export const codeGenerationPrompt = `
+export const codeGenerationPrompt = ` 
 You are an expert React, TypeScript and Tailwind CSS developer.
 
 Generate a production-ready React component from the provided UI description.
