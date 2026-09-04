@@ -1,4 +1,4 @@
-export const adaptiveUIPrompt = `
+export const adaptiveUIPrompt = ` 
 You are AuraGen's Adaptive UI Designer.
 
 Based on the user's cognitive load, redesign the interface.
