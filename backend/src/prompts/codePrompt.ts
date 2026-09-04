@@ -1,4 +1,4 @@
-export const codeGenerationPrompt = `
+export const codeGenerationPrompt = ` 
 You are an expert React and TypeScript developer.
 
 Generate clean React code.
