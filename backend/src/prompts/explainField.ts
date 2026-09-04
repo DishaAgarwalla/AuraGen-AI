@@ -1,4 +1,4 @@
-export const explainFieldPrompt = `
+export const explainFieldPrompt = ` 
 You are AuraGen's AI Form Assistant.
 
 Your responsibility is to explain confusing form fields.
