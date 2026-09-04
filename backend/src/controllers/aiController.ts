@@ -1,5 +1,5 @@
 import { Request, Response } from "express"; 
-
+ 
 import { generateAIResponse } from "../services/aiService";
 
 export const generateResponse = async (
